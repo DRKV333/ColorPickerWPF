@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -249,6 +251,22 @@ namespace ColorPickerWPF.Code
                 xr.Dispose();
             }
             return result;
+        }
+
+        public static BitmapImage GetBitmapImage(Bitmap image)
+        {
+            using (var ms = new MemoryStream())
+            {
+                image.Save(ms, ImageFormat.Png);
+                ms.Seek(0, SeekOrigin.Begin);
+
+                var output = new BitmapImage();
+                output.BeginInit();
+                output.CacheOption = BitmapCacheOption.OnLoad;
+                output.StreamSource = ms;
+                output.EndInit();
+                return output;
+            }
         }
     }
 }
