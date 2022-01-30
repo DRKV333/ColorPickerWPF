@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Media;
 using ColorPickerWPF.Code;
-using ColorPickerWPF.Properties;
 
 namespace ColorPickerWPF
 {
