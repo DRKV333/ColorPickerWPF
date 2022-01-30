@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using ColorPickerWPF.Code;
+using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using ColorPickerWPF.Code;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace ColorPickerWPF
@@ -26,7 +25,6 @@ namespace ColorPickerWPF
         {
             InitializeComponent();
         }
-
 
         private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -55,10 +53,7 @@ namespace ColorPickerWPF
                 var color = border.Background as SolidColorBrush;
                 OnPickColor?.Invoke(color.Color);
             }
-
-            
         }
-
 
         internal List<ColorSwatchItem> GetColors()
         {

@@ -22,7 +22,6 @@ namespace ColorPickerWPF.Code
             return Color.FromArgb(255, bytes[0], bytes[1], bytes[2]);
         }
 
-        
         public static string ToHexString(this Color c)
         {
             return "#" + c.A.ToString("X2") + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
@@ -45,7 +44,6 @@ namespace ColorPickerWPF.Code
             return false;
         }
 
-
         public static BitmapImage GetBitmapImage(BitmapSource bitmapSource)
         {
             JpegBitmapEncoder encoder = new JpegBitmapEncoder();
@@ -64,7 +62,7 @@ namespace ColorPickerWPF.Code
 
             return bImg;
         }
-        
+
         public static float GetHue(this System.Windows.Media.Color c)
         {
             var color = System.Drawing.Color.FromArgb(c.A, c.R, c.G, c.B);
@@ -85,7 +83,6 @@ namespace ColorPickerWPF.Code
 
         public static Color FromAhsb(int alpha, float hue, float saturation, float brightness)
         {
-
             if (0 > alpha || 255 < alpha)
             {
                 throw new ArgumentOutOfRangeException("alpha", alpha,
@@ -152,14 +149,19 @@ namespace ColorPickerWPF.Code
             {
                 case 1:
                     return Color.FromArgb((byte)alpha, iMid, iMax, iMin);
+
                 case 2:
                     return Color.FromArgb((byte)alpha, iMin, iMax, iMid);
+
                 case 3:
                     return Color.FromArgb((byte)alpha, iMin, iMid, iMax);
+
                 case 4:
                     return Color.FromArgb((byte)alpha, iMid, iMin, iMax);
+
                 case 5:
                     return Color.FromArgb((byte)alpha, iMax, iMin, iMid);
+
                 default:
                     return Color.FromArgb((byte)alpha, iMax, iMid, iMin);
             }
@@ -178,10 +180,8 @@ namespace ColorPickerWPF.Code
                 list.Add(Color.FromArgb(c.A, c.R, c.G, c.B));
             }
 
-            
             return list;
         }
-
 
         public static void SaveToXml<T>(this T obj, string filename)
         {
@@ -211,7 +211,6 @@ namespace ColorPickerWPF.Code
             writer.Close();
             writer.Dispose();
 
-
             return xml;
         }
 
@@ -224,7 +223,7 @@ namespace ColorPickerWPF.Code
                 var xr = new XmlTextReader(sr);
 
                 var xmlSerializer = new XmlSerializer(typeof(T));
-                
+
                 result = (T)xmlSerializer.Deserialize(xr);
 
                 xr.Close();
@@ -243,7 +242,7 @@ namespace ColorPickerWPF.Code
                 var xr = XmlReader.Create(new StringReader(xml));
 
                 var xmlSerializer = new XmlSerializer(typeof(T));
-                
+
                 result = (T)xmlSerializer.Deserialize(xr);
 
                 xr.Close();
@@ -251,6 +250,5 @@ namespace ColorPickerWPF.Code
             }
             return result;
         }
-
     }
 }

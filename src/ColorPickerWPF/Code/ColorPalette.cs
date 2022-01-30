@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Xml.Serialization;
 
@@ -17,8 +15,10 @@ namespace ColorPickerWPF.Code
 
         [XmlIgnore]
         protected const int NumColorsFirstSwatch = 39;
+
         [XmlIgnore]
         protected const int NumColorsCustomSwatch = 44;
+
         [XmlIgnore]
         protected const int NumColorsSecondSwatch = 112;
 
@@ -80,7 +80,6 @@ namespace ColorPickerWPF.Code
                 Colors.WhiteSmoke,
                 Colors.AliceBlue,
 
-
                 Color.FromArgb(255, 5, 5, 5),
                 Color.FromArgb(255, 15, 15, 15),Color.FromArgb(255, 35, 35, 35),
                 Color.FromArgb(255, 55, 55, 55),
@@ -101,10 +100,9 @@ namespace ColorPickerWPF.Code
                 .ToList());
         }
 
-
         protected List<ColorSwatchItem> GetColorSwatchItems(List<Color> colors)
         {
             return colors.Select(x => new ColorSwatchItem() { Color = x, HexString = x.ToHexString() }).ToList();
-        } 
+        }
     }
 }

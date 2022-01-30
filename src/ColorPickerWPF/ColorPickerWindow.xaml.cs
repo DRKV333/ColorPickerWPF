@@ -1,7 +1,6 @@
-﻿using System;
+﻿using ColorPickerWPF.Code;
 using System.Windows;
 using System.Windows.Media;
-using ColorPickerWPF.Code;
 
 namespace ColorPickerWPF
 {
@@ -13,12 +12,12 @@ namespace ColorPickerWPF
         protected readonly int WidthMax = 574;
         protected readonly int WidthMin = 342;
         protected bool SimpleMode { get; set; }
-        
+
         public ColorPickerWindow()
         {
             InitializeComponent();
         }
-        
+
         public static bool ShowDialog(out Color color, ColorPickerDialogOptions flags = ColorPickerDialogOptions.None, ColorPickerControl.ColorPickerChangeHandler customPreviewEventHandler = null)
         {
             if ((flags & ColorPickerDialogOptions.LoadCustomPalette) == ColorPickerDialogOptions.LoadCustomPalette)
@@ -43,7 +42,7 @@ namespace ColorPickerWPF
             {
                 instance.ColorPicker.OnPickColor += customPreviewEventHandler;
             }
-            
+
             var result = instance.ShowDialog();
             if (result.HasValue && result.Value)
             {
@@ -53,7 +52,7 @@ namespace ColorPickerWPF
 
             return false;
         }
-        
+
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
