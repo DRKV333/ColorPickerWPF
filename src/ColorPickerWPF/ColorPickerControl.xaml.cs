@@ -137,6 +137,8 @@ namespace ColorPickerWPF
 
             ColorDisplayBorder.Background = new SolidColorBrush(Color);
 
+            HexBox.Text = Util.ToHexStringWithoutAlpha(Color);
+
             IsSettingValues = false;
             OnPickColor?.Invoke(color);
         }
@@ -462,6 +464,22 @@ namespace ColorPickerWPF
         public void LoadDefaultCustomPalette()
         {
             LoadCustomPalette(Path.Combine(ColorPickerSettings.CustomColorsDirectory, ColorPickerSettings.CustomColorsFilename));
+        }
+
+        private void HexBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (!IsSettingValues)
+            {
+                try
+                {
+                    if (ColorDisplayBorder != null)
+                        SetColor(Util.ColorFromHexString(HexBox.Text));
+                }
+                catch (Exception)
+                {
+                    // If conversion fails, do nothing.
+                }
+            }
         }
     }
 }

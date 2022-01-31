@@ -28,6 +28,11 @@ namespace ColorPickerWPF.Code
         {
             return "#" + c.A.ToString("X2") + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
         }
+        
+        public static string ToHexStringWithoutAlpha(this Color c)
+        {
+            return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
+        }
 
         public static Color ColorFromHexString(string hex)
         {
