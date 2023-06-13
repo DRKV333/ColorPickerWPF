@@ -11,7 +11,7 @@ namespace ColorPickerWPF
     public partial class ColorPickerWindow : Window
     {
         protected readonly int WidthMax = 574;
-        protected readonly int WidthMin = 342;
+        protected readonly int WidthMin = 330;
         protected bool SimpleMode { get; set; }
 
         public ColorPickerWindow()

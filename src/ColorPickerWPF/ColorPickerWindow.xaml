@@ -6,7 +6,8 @@
         xmlns:colorPickerWpf="clr-namespace:ColorPickerWPF"
         x:Class="ColorPickerWPF.ColorPickerWindow"
         mc:Ignorable="d"
-        Title="Color Picker" WindowStartupLocation="CenterScreen" Width="574" MinWidth="342" SizeToContent="Height" MinHeight="450" Icon="Resources/icon.png">
+        Title="Color Picker" WindowStartupLocation="CenterScreen" Width="574" MinWidth="330" SizeToContent="Height" MinHeight="450" Icon="Resources/icon.png"
+        ResizeMode="NoResize">
     <DockPanel LastChildFill="False">
 
         <colorPickerWpf:ColorPickerControl x:Name="ColorPicker"  DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" MinHeight="372" />
