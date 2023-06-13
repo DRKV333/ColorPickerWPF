@@ -1,8 +1,6 @@
 ﻿using ColorPickerWPF.Code;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -38,8 +36,9 @@ namespace ColorPickerWPF
 
         internal static ColorPalette ColorPalette;
         
-        private Bitmap _colorPicker2;
+        private FormatConvertedBitmap _colorPicker2;
         private byte[] _colorPicker2_Data;
+        private WriteableBitmap _colorPicker2Output;
 
         public ColorPickerControl()
         {
@@ -314,91 +313,60 @@ namespace ColorPickerWPF
             if (sliderHue <= 0f || sliderHue >= 360f)
             {
                 // No hue change just return
-                SampleImage2.Source = Util.GetBitmapImage(_colorPicker2);
                 return;
             }
 
-            var outputImage = new Bitmap(_colorPicker2.Width, _colorPicker2.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-            var rect = new Rectangle(0, 0, _colorPicker2.Width, _colorPicker2.Height);
-            var imagedata = outputImage.LockBits(rect, ImageLockMode.ReadOnly, outputImage.PixelFormat);
-            var imagedepth = Image.GetPixelFormatSize(imagedata.PixelFormat) / 8;
-            var imagebuffer = new byte[imagedata.Width * imagedata.Height * imagedepth];
+            var imagebuffer = new byte[_colorPicker2_Data.Length];
 
             // Copy the image data from our color picker into the array for our output image, so we dont change the values of the original image.
             Array.Copy(_colorPicker2_Data, imagebuffer, imagebuffer.Length);
 
-            for (int x = 0; x < imagedata.Width; x++)
+            for (int x = 0; x < _colorPicker2.PixelWidth; x++)
             {
-                for (int y = 0; y < imagedata.Height; y++)
+                for (int y = 0; y < _colorPicker2.PixelHeight; y++)
                 {
-                    var offset = (y * imagedata.Width + x) * imagedepth;
+                    var offset = (y * _colorPicker2.PixelWidth + x) * 4;
 
                     System.Drawing.Color pixel;
-                    // The byte-order of the pixel-format is endian-dependent
-                    if (BitConverter.IsLittleEndian)
-                    {
-                        // On little-endian architectures the byte-order is BGRA
-                        pixel = System.Drawing.Color.FromArgb(imagebuffer[offset + 3], imagebuffer[offset + 2],
-                            imagebuffer[offset + 1], imagebuffer[offset]);
-                    }
-                    else
-                    {
-                        // On big-endian architectures the byte-order is ARGB
-                        pixel = System.Drawing.Color.FromArgb(imagebuffer[offset], imagebuffer[offset + 1],
-                            imagebuffer[offset + 2], imagebuffer[offset + 3]);
-                    }
+
+                    pixel = System.Drawing.Color.FromArgb(255, imagebuffer[offset + 2],
+                        imagebuffer[offset + 1], imagebuffer[offset]);
 
                     var newHue = (float)(sliderHue + pixel.GetHue());
                     if (newHue >= 360) newHue -= 360;
 
                     var color = Util.FromAhsb((int)255, newHue, pixel.GetSaturation(), pixel.GetBrightness());
 
-                    if (BitConverter.IsLittleEndian)
-                    {
-                        imagebuffer[offset + 0] = color.B;
-                        imagebuffer[offset + 1] = color.G;
-                        imagebuffer[offset + 2] = color.R;
-                        imagebuffer[offset + 3] = color.A;
-                    }
-                    else
-                    {
-                        imagebuffer[offset + 0] = color.A;
-                        imagebuffer[offset + 1] = color.R;
-                        imagebuffer[offset + 2] = color.G;
-                        imagebuffer[offset + 3] = color.B;
-                    }
+                    imagebuffer[offset + 0] = color.B;
+                    imagebuffer[offset + 1] = color.G;
+                    imagebuffer[offset + 2] = color.R;
+                    imagebuffer[offset + 3] = color.A;
                 }
             }
 
             // Copy back the changed pixels to the image
-            Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
-            outputImage.UnlockBits(imagedata);
-            SampleImage2.Source = Util.GetBitmapImage(outputImage);
+            _colorPicker2Output.Lock();
+            Marshal.Copy(imagebuffer, 0, _colorPicker2Output.BackBuffer, imagebuffer.Length);
+            _colorPicker2Output.AddDirtyRect(new Int32Rect(0, 0, _colorPicker2Output.PixelWidth, _colorPicker2.PixelHeight));
+            _colorPicker2Output.Unlock();
         }
 
         private void LoadColorPicker2()
         {
             //Load the embedded resource
-            _colorPicker2 = new Bitmap(Application.GetResourceStream(
-                               new Uri("pack://application:,,,/ColorPickerWPF;component/Resources/colorpicker2.png",
-                                   UriKind.Absolute)).Stream);
+            BitmapImage image = new BitmapImage(new Uri("pack://application:,,,/ColorPickerWPF;component/Resources/colorpicker2.png", UriKind.Absolute));
 
-            //Ensure that the resource is in the expected format
-            var img = new Bitmap(_colorPicker2.Width, _colorPicker2.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-            using (var g = Graphics.FromImage(img))
-            {
-                g.DrawImage(_colorPicker2, new Rectangle(0, 0, _colorPicker2.Width, _colorPicker2.Height));
-            }
-            _colorPicker2 = img;
+            _colorPicker2 = new FormatConvertedBitmap();
+            _colorPicker2.BeginInit();
+            _colorPicker2.Source = image;
+            _colorPicker2.DestinationFormat = PixelFormats.Pbgra32;
+            _colorPicker2.EndInit();
 
-            //Load the pixel-data from the bitmap into a byte-array that we can access directly later.
-            var rect = new Rectangle(0, 0, _colorPicker2.Width, _colorPicker2.Height);
-            var imagedata = _colorPicker2.LockBits(rect, ImageLockMode.ReadOnly, _colorPicker2.PixelFormat);
-            var imagedepth = Image.GetPixelFormatSize(imagedata.PixelFormat) / 8;
-            var imagebuffer = new byte[imagedata.Width * imagedata.Height * imagedepth];
-            Marshal.Copy(imagedata.Scan0, imagebuffer, 0, imagebuffer.Length);
-            _colorPicker2_Data = imagebuffer;
-            _colorPicker2.UnlockBits(imagedata);
+            _colorPicker2_Data = new byte[_colorPicker2.PixelWidth * _colorPicker2.PixelHeight * 4];
+            _colorPicker2.CopyPixels(_colorPicker2_Data, _colorPicker2.PixelWidth * 4, 0);
+
+            _colorPicker2Output = new WriteableBitmap(_colorPicker2.PixelWidth, _colorPicker2.PixelHeight, 96, 96, PixelFormats.Pbgra32, null);
+            SampleImage2.Source = _colorPicker2Output;
         }
 
         private void OnPicker2Selected(object sender, RoutedEventArgs e)
